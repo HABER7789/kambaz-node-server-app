@@ -1,0 +1,86 @@
+export default[
+    {
+        "_id": "u1",
+        "username": "yuji",
+        "password": "1234",
+        "firstName": "Yuji",
+        "lastName": "Itadori",
+        "loginId": "001234561Y",
+        "section": "S101",
+        "role": "STUDENT",
+        "lastActivity": "2020-10-01",
+        "totalActivity": "10:21:32"
+    },
+    {
+        "_id": "u2",
+        "username": "gojo",
+        "password": "1234",
+        "firstName": "Satoru",
+        "lastName": "Gojo",
+        "loginId": "001234562G",
+        "section": "S101",
+        "role": "FACULTY",
+        "lastActivity": "2020-10-02",
+        "totalActivity": "12:05:17"
+    },
+    {
+        "_id": "u3",
+        "username": "megumi",
+        "password": "1234",
+        "firstName": "Megumi",
+        "lastName": "Fushiguro",
+        "loginId": "001234563M",
+        "section": "S101",
+        "role": "STUDENT",
+        "lastActivity": "2020-10-05",
+        "totalActivity": "08:44:02"
+    },
+    {
+        "_id": "u4",
+        "username": "nobara",
+        "password": "1234",
+        "firstName": "Nobara",
+        "lastName": "Kugisaki",
+        "loginId": "001234564N",
+        "section": "S101",
+        "role": "STUDENT",
+        "lastActivity": "2020-10-06",
+        "totalActivity": "07:12:40"
+    },
+    {
+        "_id": "u5",
+        "username": "panda",
+        "password": "1234",
+        "firstName": "Panda",
+        "lastName": "",
+        "loginId": "001234565P",
+        "section": "S101",
+        "role": "STUDENT",
+        "lastActivity": "2020-10-07",
+        "totalActivity": "05:33:11"
+    },
+    {
+        "_id": "u6",
+        "username": "yuta",
+        "password": "1234",
+        "firstName": "Yuta",
+        "lastName": "Okkotsu",
+        "loginId": "001234566Y",
+        "section": "S101",
+        "role": "STUDENT",
+        "lastActivity": "2020-10-08",
+        "totalActivity": "09:27:03"
+    },
+    {
+        "_id": "u7",
+        "username": "maki",
+        "password": "1234",
+        "firstName": "Maki",
+        "lastName": "Zenin",
+        "loginId": "001234567M",
+        "section": "S101",
+        "role": "TA",
+        "lastActivity": "2020-10-09",
+        "totalActivity": "06:58:44"
+    }
+]
