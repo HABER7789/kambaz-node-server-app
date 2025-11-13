@@ -1,3 +1,4 @@
+// index.js
 import express from "express";
 import cors from "cors";
 import session from "express-session";
@@ -12,16 +13,27 @@ import db from "./Kambaz/Database/index.js";
 
 const app = express();
 
-// 👇 will be localhost:3000 in dev, Vercel URL in production
+// ====== CONFIG ======
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
-// 👇 use env in Render, fallback locally
 const SESSION_SECRET = process.env.SESSION_SECRET || "any string";
 const PORT = process.env.PORT || 4000;
+const NODE_ENV = process.env.NODE_ENV || "development";
 
+const allowedOrigins = ["http://localhost:3000"];
+if (CLIENT_URL && !allowedOrigins.includes(CLIENT_URL)) {
+    allowedOrigins.push(CLIENT_URL);
+}
+
+console.log("CORS allowed origins:", allowedOrigins);
+console.log("NODE_ENV:", NODE_ENV);
+
+app.set("trust proxy", 1);
+
+// ====== MIDDLEWARE ======
 app.use(
     cors({
         credentials: true,
-        origin: CLIENT_URL,
+        origin: allowedOrigins,
     })
 );
 
@@ -30,11 +42,16 @@ app.use(
         secret: SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
+        cookie: {
+            secure: NODE_ENV === "production",
+            sameSite: NODE_ENV === "production" ? "none" : "lax",
+        },
     })
 );
 
 app.use(express.json());
 
+// ====== ROUTES ======
 UserRoutes(app, db);
 CourseRoutes(app, db);
 ModulesRoutes(app, db);
@@ -42,6 +59,7 @@ AssignmentsRoutes(app, db);
 EnrollmentsRoutes(app, db);
 Lab5Routes(app, db);
 
+// ====== START ======
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
