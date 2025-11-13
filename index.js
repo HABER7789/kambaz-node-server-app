@@ -16,6 +16,7 @@ const app = express();
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 // 👇 use env in Render, fallback locally
 const SESSION_SECRET = process.env.SESSION_SECRET || "any string";
+const PORT = process.env.PORT || 4000;
 
 app.use(
     cors({
@@ -41,6 +42,6 @@ AssignmentsRoutes(app, db);
 EnrollmentsRoutes(app, db);
 Lab5Routes(app, db);
 
-app.listen(4000, () => {
-    console.log("Server running on http://localhost:4000");
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
