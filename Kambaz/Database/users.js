@@ -20,7 +20,7 @@ export default [
         "lastName": "Gojo",
         "loginId": "001234562G",
         "section": "S101",
-        "role": "FACULTY",
+        "role": "ADMIN",
         "lastActivity": "2020-10-02",
         "totalActivity": "12:05:17",
         "email": "gojo@neu.edu"
