@@ -1,4 +1,4 @@
-export default[
+export default [
     {
         "_id": "u1",
         "username": "yuji",
@@ -9,7 +9,8 @@ export default[
         "section": "S101",
         "role": "STUDENT",
         "lastActivity": "2020-10-01",
-        "totalActivity": "10:21:32"
+        "totalActivity": "10:21:32",
+        "email": "yuji@neu.edu"
     },
     {
         "_id": "u2",
@@ -21,7 +22,8 @@ export default[
         "section": "S101",
         "role": "FACULTY",
         "lastActivity": "2020-10-02",
-        "totalActivity": "12:05:17"
+        "totalActivity": "12:05:17",
+        "email": "gojo@neu.edu"
     },
     {
         "_id": "u3",
@@ -33,7 +35,8 @@ export default[
         "section": "S101",
         "role": "STUDENT",
         "lastActivity": "2020-10-05",
-        "totalActivity": "08:44:02"
+        "totalActivity": "08:44:02",
+        "email": "megumi@neu.edu"
     },
     {
         "_id": "u4",
@@ -45,7 +48,8 @@ export default[
         "section": "S101",
         "role": "STUDENT",
         "lastActivity": "2020-10-06",
-        "totalActivity": "07:12:40"
+        "totalActivity": "07:12:40",
+        "email": "nobara@neu.edu"
     },
     {
         "_id": "u5",
@@ -57,7 +61,8 @@ export default[
         "section": "S101",
         "role": "STUDENT",
         "lastActivity": "2020-10-07",
-        "totalActivity": "05:33:11"
+        "totalActivity": "05:33:11",
+        "email": "panda@neu.edu"
     },
     {
         "_id": "u6",
@@ -69,7 +74,8 @@ export default[
         "section": "S101",
         "role": "STUDENT",
         "lastActivity": "2020-10-08",
-        "totalActivity": "09:27:03"
+        "totalActivity": "09:27:03",
+        "email": "yuta@neu.edu"
     },
     {
         "_id": "u7",
@@ -81,6 +87,7 @@ export default[
         "section": "S101",
         "role": "TA",
         "lastActivity": "2020-10-09",
-        "totalActivity": "06:58:44"
+        "totalActivity": "06:58:44",
+        "email": "maki@neu.edu"
     }
 ]

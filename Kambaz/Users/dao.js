@@ -1,44 +1,56 @@
 // Kambaz/Users/dao.js
+import model from "./model.js";
 import { v4 as uuidv4 } from "uuid";
 
-export default function UsersDao(db) {
-    const users = db.users;
+export default function UsersDao(/* db */) {
+    const findAllUsers = () => model.find();
 
-    const findAllUsers = () => users;
-    const findUserById = (id) => users.find((u) => u._id === id);
-    const findUserByCredentials = (username, password) =>
-        users.find((u) => u.username === username && u.password === password);
+    const findUserById = (id) => model.findById(id);
 
-    
     const findUserByUsername = (username) =>
-        users.find((u) => u.username === username);
+        model.findOne({ username });
+
+    const findUserByCredentials = (username, password) =>
+        model.findOne({ username, password });
+
+    // NEW: filter by exact role
+    const findUsersByRole = (role) => model.find({ role });
+
+    // NEW: filter by partial first/last name (case-insensitive)
+    const findUsersByPartialName = (partialName) => {
+        const regex = new RegExp(partialName, "i");
+        return model.find({
+            $or: [
+                { firstName: { $regex: regex } },
+                { lastName: { $regex: regex } },
+            ],
+        });
+    };
 
     const createUser = (user) => {
-        const newUser = { ...user, _id: uuidv4() }; 
-        users.push(newUser);
-        return newUser;
+        const newUser = { ...user, _id: uuidv4() };
+        return model.create(newUser); // insert new user into DB
     };
 
-    const updateUser = (id, updates) => {
-        const i = users.findIndex((u) => u._id === id);
-        if (i === -1) return null;
-        users[i] = { ...users[i], ...updates };
-        return users[i];
-    };
 
-    const deleteUser = (id) => {
-        const i = users.findIndex((u) => u._id === id);
-        if (i === -1) return false;
-        users.splice(i, 1);
-        return true;
-    };
-    
+
+    const updateUser = (id, updates) =>
+        model.findByIdAndUpdate(
+            id,
+            { $set: updates },
+            { new: true }
+        );
+
+    const deleteUser = (id) =>
+        model.deleteOne({ _id: id });
 
     return {
         findAllUsers,
         findUserById,
         findUserByCredentials,
-        findUserByUsername,     
+        findUserByUsername,
+        findUsersByRole,
+        findUsersByPartialName,
         createUser,
         updateUser,
         deleteUser,

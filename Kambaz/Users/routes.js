@@ -1,10 +1,10 @@
-
+// Kambaz/Users/routes.js
 import UsersDao from "./dao.js";
 
 export default function UserRoutes(app, db) {
     const dao = UsersDao(db);
 
-
+    // debug logging
     app.use("/api/users", (req, res, next) => {
         console.log(`🧪 [USERS] ${req.method} ${req.originalUrl}`);
         console.log("   cookies:", req.headers.cookie || "(none)");
@@ -15,35 +15,57 @@ export default function UserRoutes(app, db) {
         next();
     });
 
-    const createUser = (req, res) => {
-        const user = dao.createUser(req.body);
+    const createUser = async (req, res) => {
+        const user = await dao.createUser(req.body);
         res.json(user);
     };
 
-    const deleteUser = (req, res) => {
-        const ok = dao.deleteUser(req.params.userId);
-        if (!ok) return res.status(404).json({ message: "User not found" });
+    const deleteUser = async (req, res) => {
+        const { deletedCount } = await dao.deleteUser(req.params.userId);
+        if (!deletedCount) {
+            return res.status(404).json({ message: "User not found" });
+        }
         res.sendStatus(200);
     };
 
-    const findAllUsers = (req, res) => res.json(dao.findAllUsers());
+    
+    const findAllUsers = async (req, res) => {
+        const { role, name } = req.query;
 
-    const findUserById = (req, res) => {
-        const user = dao.findUserById(req.params.userId);
-        if (!user) return res.status(404).json({ message: "User not found" });
+        if (role) {
+            const users = await dao.findUsersByRole(role);
+            res.json(users);
+            return;
+        }
+
+        if (name) {
+            const users = await dao.findUsersByPartialName(name);
+            res.json(users);
+            return;
+        }
+
+        const users = await dao.findAllUsers();
+        res.json(users);
+    };
+
+    // 6.2.6.4 / 6.2.6.5: by ID
+    const findUserById = async (req, res) => {
+        const user = await dao.findUserById(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
         res.json(user);
     };
 
-    const updateUser = (req, res) => {
+    const updateUser = async (req, res) => {
         const userId = req.params.userId;
         const updates = req.body;
 
-        const updatedUser = dao.updateUser(userId, updates);
+        const updatedUser = await dao.updateUser(userId, updates);
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Only update session.currentUser if THIS is the logged-in user
         const current = req.session["currentUser"];
         if (current && current._id === userId) {
             req.session["currentUser"] = updatedUser;
@@ -52,33 +74,28 @@ export default function UserRoutes(app, db) {
         res.json(updatedUser);
     };
 
-
-    const signup = (req, res) => {
+    const signup = async (req, res) => {
         const { username } = req.body;
-        const taken = dao.findUserByUsername(username);
+        const taken = await dao.findUserByUsername(username);
         if (taken) {
             return res.status(400).json({ message: "Username already in use" });
         }
-        const currentUser = dao.createUser(req.body);
+        const currentUser = await dao.createUser(req.body);
         req.session["currentUser"] = currentUser;
         res.json(currentUser);
     };
 
-    const signin = (req, res) => {
+    const signin = async (req, res) => {
         const { username, password } = req.body;
-        const user = dao.findUserByCredentials(username, password);
-        if (!user) return res.status(401).json({ message: "Invalid credentials" });
-        const currentUser = dao.findUserByCredentials(username, password);
-        if (currentUser) {
-            req.session["currentUser"] = currentUser;
-            res.json(currentUser);
-        } else {
-            res.status(401).json({ message: "Unable to login. Try again later." });
+        const currentUser = await dao.findUserByCredentials(username, password);
+        if (!currentUser) {
+            return res.status(401).json({ message: "Invalid credentials" });
         }
+        req.session["currentUser"] = currentUser;
+        res.json(currentUser);
     };
 
     const signout = (req, res) => {
-
         req.session.destroy();
         res.sendStatus(200);
     };
