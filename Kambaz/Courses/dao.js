@@ -1,54 +1,33 @@
+// Kambaz/Courses/dao.js
+import model from "./model.js";
 import { v4 as uuidv4 } from "uuid";
 
 export default function CoursesDao(db) {
-    function findAllCourses() {
-        return db.courses;
-    }
+    // Fetch all courses with everything the cards need
+    const findAllCourses = () =>
+        model.find({}, { name: 1, description: 1, number: 1, img: 1 });
 
-    function findCoursesForEnrolledUser(userId) {
-        const { courses, enrollments } = db;
-        const enrolledCourses = courses.filter((course) =>
-            enrollments.some(
-                (enrollment) =>
-                    enrollment.user === userId &&
-                    enrollment.course === course._id
-            )
-        );
-        return enrolledCourses;
-    }
+    const findCourseById = (courseId) => model.findById(courseId);
 
-    function createCourse(course) {
-        const newCourse = { ...course, _id: uuidv4() };
-        db.courses = [...db.courses, newCourse];
-        return newCourse;
-    }
+    const createCourse = (course) => {
+        const newCourse = {
+            ...course,
+            _id: course._id || course.number || uuidv4(),
+        };
+        return model.create(newCourse);
+    };
 
-    function updateCourse(courseId, courseUpdates) {
-        const { courses } = db;
-        const course = courses.find((course) => course._id === courseId);
-        if (!course) return null;
-        Object.assign(course, courseUpdates);
-        return course;
-    }
+    const deleteCourse = (courseId) =>
+        model.deleteOne({ _id: courseId });
 
-    // 🔧 NEW: deleteCourse used by DELETE /api/courses/:courseId
-    function deleteCourse(courseId) {
-        const { courses } = db;
-        const index = courses.findIndex((course) => course._id === courseId);
-        if (index === -1) return { deletedCount: 0 };
-
-        db.courses = [
-            ...courses.slice(0, index),
-            ...courses.slice(index + 1),
-        ];
-        return { deletedCount: 1 };
-    }
+    const updateCourse = (courseId, courseUpdates) =>
+        model.updateOne({ _id: courseId }, { $set: courseUpdates });
 
     return {
         findAllCourses,
-        findCoursesForEnrolledUser,
+        findCourseById,
         createCourse,
-        updateCourse,
         deleteCourse,
+        updateCourse,
     };
 }

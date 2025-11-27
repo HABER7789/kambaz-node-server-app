@@ -1,29 +1,41 @@
+// Kambaz/Modules/dao.js
 import { v4 as uuidv4 } from "uuid";
+import ModuleModel from "./model.js";
 
 export default function ModulesDao(db) {
-    function findModulesForCourse(courseId) {
-        const { modules } = db;
-        return modules.filter((module) => module.course === courseId);
+    // 6.4.2 – modules in their own collection, related to courses by course field
+
+    // find all modules for a given course
+    async function findModulesForCourse(courseId) {
+        return ModuleModel.find({ course: courseId });
     }
 
-    function createModule(module) {
-        const newModule = { ...module, _id: uuidv4() };
-        db.modules = [...db.modules, newModule];
-        return newModule;
+    // create a module for a course
+    async function createModule(courseId, module) {
+        const newModule = {
+            ...module,
+            _id: uuidv4(),
+            course: courseId,
+            lessons: module.lessons || [],
+        };
+        const created = await ModuleModel.create(newModule);
+        return created;
     }
 
-    function deleteModule(moduleId) {
-        const { modules } = db;
-        db.modules = modules.filter((module) => module._id !== moduleId);
-        return { deletedCount: modules.length - db.modules.length };
+    // delete a module
+    async function deleteModule(courseId, moduleId) {
+        // courseId is in the URL but we don't actually need it for deletion
+        return ModuleModel.deleteOne({ _id: moduleId });
     }
 
-    function updateModule(moduleId, moduleUpdates) {
-        const { modules } = db;
-        const module = modules.find((m) => m._id === moduleId);
-        if (!module) return null;
-        Object.assign(module, moduleUpdates);
-        return module;
+    // update a module
+    async function updateModule(courseId, moduleId, moduleUpdates) {
+        const status = await ModuleModel.updateOne(
+            { _id: moduleId },
+            { $set: moduleUpdates }
+        );
+        if (!status.matchedCount) return null;
+        return ModuleModel.findById(moduleId);
     }
 
     return {

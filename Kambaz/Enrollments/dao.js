@@ -1,45 +1,55 @@
 // Kambaz/Enrollments/dao.js
-import { v4 as uuidv4 } from "uuid";
+import model from "./model.js";
 
 export default function EnrollmentsDao(db) {
-    function enrollUserInCourse(userId, courseId) {
-        const { enrollments } = db;
-
-        // avoid duplicate enrollments
-        const existing = enrollments.find(
-            (e) => e.user === userId && e.course === courseId
-        );
-        if (existing) {
-            return existing;
-        }
-
-        const newEnrollment = { _id: uuidv4(), user: userId, course: courseId };
-        enrollments.push(newEnrollment);
-        return newEnrollment;
+    // All raw enrollment docs for a user (used by /api/users/current/enrollments)
+    async function findEnrollmentsForUser(userId) {
+        return model.find({ user: userId });
     }
 
-    function unenrollUserFromCourse(userId, courseId) {
-        const { enrollments } = db;
-        const before = enrollments.length;
-        db.enrollments = enrollments.filter(
-            (e) => !(e.user === userId && e.course === courseId)
-        );
-        return { deletedCount: before - db.enrollments.length };
+    // Courses a user is enrolled in (used for /api/users/:uid/courses)
+    async function findCoursesForUser(userId) {
+        const enrollments = await model
+            .find({ user: userId })
+            .populate("course");
+        return enrollments.map((enrollment) => enrollment.course);
     }
 
-    // All user objects enrolled in a course
-    function findUsersForCourse(courseId) {
-        const { enrollments, users } = db;
-        const courseEnrollments = enrollments.filter(
-            (e) => e.course === courseId
-        );
-        const userIds = new Set(courseEnrollments.map((e) => e.user));
-        return users.filter((u) => userIds.has(u._id));
+    // All user documents enrolled in a given course (for People page)
+    async function findUsersForCourse(courseId) {
+        const enrollments = await model
+            .find({ course: courseId })
+            .populate("user");
+        return enrollments.map((enrollment) => enrollment.user);
+    }
+
+    // Enroll a user in a course
+    async function enrollUserInCourse(userId, courseId) {
+        return model.create({
+            _id: `${userId}-${courseId}`, // composite key to avoid duplicates
+            user: userId,
+            course: courseId,
+            enrollmentDate: new Date(),
+            status: "ENROLLED",
+        });
+    }
+
+    // Unenroll one user from one course
+    async function unenrollUserFromCourse(userId, courseId) {
+        return model.deleteOne({ user: userId, course: courseId });
+    }
+
+    // Remove ALL enrollments for a course (used when deleting a course)
+    async function unenrollAllUsersFromCourse(courseId) {
+        return model.deleteMany({ course: courseId });
     }
 
     return {
+        findEnrollmentsForUser,
+        findCoursesForUser,
+        findUsersForCourse,
         enrollUserInCourse,
         unenrollUserFromCourse,
-        findUsersForCourse,
+        unenrollAllUsersFromCourse,
     };
 }

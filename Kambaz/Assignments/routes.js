@@ -1,35 +1,42 @@
-
+// Kambaz/Assignments/routes.js
 import AssignmentsDao from "./dao.js";
 
 export default function AssignmentsRoutes(app, db) {
     const dao = AssignmentsDao(db);
 
-    const findAssignmentsForCourse = (req, res) => {
+    // GET /api/courses/:courseId/assignments
+    const findAssignmentsForCourse = async (req, res) => {
         const { courseId } = req.params;
-        const assignments = dao.findAssignmentsForCourse(courseId);
+        const assignments = await dao.findAssignmentsForCourse(courseId);
         res.json(assignments);
     };
 
-    const createAssignmentForCourse = (req, res) => {
+    // POST /api/courses/:courseId/assignments
+    const createAssignmentForCourse = async (req, res) => {
         const { courseId } = req.params;
         const assignment = {
             ...req.body,
             course: courseId,
         };
-        const newAssignment = dao.createAssignment(assignment);
+        const newAssignment = await dao.createAssignment(assignment);
         res.send(newAssignment);
     };
 
-    const deleteAssignment = (req, res) => {
+    // DELETE /api/assignments/:assignmentId
+    const deleteAssignment = async (req, res) => {
         const { assignmentId } = req.params;
-        const status = dao.deleteAssignment(assignmentId);
+        const status = await dao.deleteAssignment(assignmentId);
         res.send(status);
     };
 
-    const updateAssignment = (req, res) => {
+    // PUT /api/assignments/:assignmentId
+    const updateAssignment = async (req, res) => {
         const { assignmentId } = req.params;
         const assignmentUpdates = req.body;
-        const updated = dao.updateAssignment(assignmentId, assignmentUpdates);
+        const updated = await dao.updateAssignment(
+            assignmentId,
+            assignmentUpdates
+        );
         if (!updated) {
             res.sendStatus(404);
             return;
